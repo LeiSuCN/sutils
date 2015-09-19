@@ -3,7 +3,6 @@ package com.leisucn.utils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.Files;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
@@ -13,7 +12,7 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.logging.log4j.LogManager;
@@ -51,9 +50,13 @@ public class WebUtils {
 		
 		try( CloseableHttpClient client = HttpClients.createDefault() ){
 			
-			HttpUriRequest request = method.equalsIgnoreCase("GET") ?
+			HttpRequestBase request = method.equalsIgnoreCase("GET") ?
 					new HttpGet(target) : new HttpPost(target);
 			
+			// 设置
+			// RequestConfig config = RequestConfig.copy(RequestConfig.DEFAULT).build();
+			// request.setConfig(config);
+
 			client.execute(request, new ResponseHandler<StatusLine>() {
 
 				@Override
@@ -62,7 +65,7 @@ public class WebUtils {
 					HttpEntity entity = response.getEntity();
 					try( InputStream is = entity.getContent() ){
 						int length = -1;
-						byte[] buffer = new byte[512*1000];
+						byte[] buffer = new byte[512*1000]; // 512K
 						while( (length = is.read(buffer)) != -1 ){
 							os.write(buffer, 0, length);
 						}
